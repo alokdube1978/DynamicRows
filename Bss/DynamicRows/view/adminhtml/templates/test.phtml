@@ -1,0 +1,144 @@
+<?php
+/*** @var \Mrmodule\ImageDynamicConfig\Block\Adminhtml\ImageButton $block */
+$css = $block->getAssertRepository()->createAsset("Mrmodule_ImageDynamicConfig::css/image_button.css");
+$dataform_name=$block->getDataformName(); 
+$container_name=$block->getContainerName(); 
+// echo $dataform_name; die;
+?>
+<link rel="stylesheet" type="text/css" media="all" href="<?php /* @escapeNotVerified */echo $css->getUrl() ?>"/>
+
+<div class="upload-file">
+    <div class="upload-file__block upload-file__block_first">
+        <img class="upload-file_block_img" >
+    </div>
+    <div class="upload-file__block">
+        <input  class="upload-file__input" name="img" data-index="img" hidden type="file" id="swatch_image_input" value=""/>
+        <label class="upload-file__label" for="swatch_image_input">
+            <?= __("File") ?>
+        </label>
+    </div>
+	
+    <input class="upload-file_string admin__control-text" data-form-part="<?php echo$block->getDataformName()?>"  type="text" value="aaa" 
+	hidden
+	>
+	
+</div>
+
+
+
+<!-- we add js per element below, alternatively to play on the whole grid we could also look at extending
+\vendor\magento\module-ui\view\base\web\js\dynamic-rows\dynamic-rows-grid.js
+-->
+<script type="text/javascript">
+    require(["jquery"], function (jq) {
+        jq(function (e) {
+		console.log("in jq");
+		var table=jq("table[data-index='<?php echo $container_name; ?>']")[0];
+		// console.log(table);
+		var rows=table.rows;
+		// console.log(rows);
+		// console.log(rows.length);
+		for (i=1; i< rows.length; i++)
+		{
+			console.log("in loop:"+(i-1));
+			imageplaceholder=rows[i].getElementsByClassName('upload-file_block_img');
+			label=rows[i].getElementsByClassName("upload-file__label")
+			imagestring=rows[i].getElementsByClassName('upload-file_string');
+			fileinput=rows[i].getElementsByClassName('upload-file__input');
+			if (fileinput.length>0)
+			{
+			// console.log("row:"+i);
+			// console.log(fileinput);
+			// console.log(imageplaceholder);
+			// console.log(label);
+			fileinput[0].id="fileinput-"+(i-1);
+			imageplaceholder[0].id="imageplaceholder-"+(i-1);
+			
+			imagestring[0].id="imagestring-"+(i-1);
+			imagestring[0].name="<?php echo $container_name; ?>"+"["+(i-1)+"][imagestring]";
+		
+			label[0].htmlFor=fileinput[0].id;
+			
+		
+			}
+		}
+		
+	
+		jq('.upload-file__input').change(function(e)
+		{
+		e.stopImmediatePropagation();
+		console.log("file change");
+		console.log(e.target.id);
+		var row_ref=e.target.id;
+		var row_id=row_ref.replace(/fileinput-/g,'');
+		var fileupload_data=jq('#fileinput-'+row_id).val();
+		console.log(fileupload_data);
+		if (e.target.files.length==0 || fileupload_data=='' ) { return; }
+		else{
+		
+		file = this.files[0]
+		console.log(file);
+		fileChosen = this.files[0].name;
+		console.log(fileChosen);
+		imagesrc=document.getElementById('imagestring-'+row_id);
+		imageplaceholder=document.getElementById('imageplaceholder-'+row_id);
+		// console.log(imagesrc);
+		const reader = new FileReader();
+		reader.addEventListener('load', (event) => {
+						console.log("reader loaded");
+						// console.log(event.target.result);
+						imagesrc.value=event.target.result;
+						imageplaceholder.setAttribute('src',  event.target.result);
+				});
+		reader.readAsDataURL(file);
+				
+		}
+		});
+		// console.log(jq(this).closest('tr'));
+		// console.log(jq(this).closest('td')[0].parentNode)
+		// console.log(jq(this).closest('td')[0].parentNode.index);
+		// console.log(e.target.tagName)
+		// console.log(e.target.parentNode.tagName);
+		// console.log(e.target.parentNode.parentNode.tagName);
+		// console.log(e.target.parentNode.parentNode.parentNode.tagName);
+		// console.log(e.target.parentNode.parentNode.parentNode.parentNode.tagName);
+		// console.log('Row:'+jq(this).parent().find('td').html());
+		// })
+            // const id = "<?=$block->getId()?>"
+            // const imageId = "swatch_image_image_<?=$block->getId()?>"
+            // const data = jq("#" + id).val();
+			// var fileupload_data=jq("#swatch_image_input_" +id).val()
+			// console.log("#swatch_image_input_" +id);
+			// console.log(fileupload_data);
+			// jq("#swatch_image_input_" +id).change(function(e)
+			// { 
+				// console.log("click"); 
+				// console.log(e); 
+				// console.log(e.target.value);
+				// file = this.files[0]
+				// console.log(file);
+				// fileChosen = this.files[0].name;
+				// imagesrc=document.getElementById(imageId);
+				// console.log(imagesrc);
+				// const reader = new FileReader();
+				// reader.addEventListener('load', (event) => {
+						// console.log("reader loaded");
+						// // console.log(event.target.result);
+						// imagesrc.setAttribute('src',  event.target.result);
+				// });
+				// reader.readAsDataURL(file);
+				// })
+			// if (fileupload_data)
+			// {
+			// console.log("we have image");
+			// console.log(fileupload_data);
+			// }
+			
+            // console.log(data, id)
+            // if (data) {
+                // jq("#" + imageId).attr("src", data)
+                // jq("#" + imageId).attr("value", data)
+            // }
+        });
+    });
+</script>
