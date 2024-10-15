@@ -18,7 +18,7 @@ $container_name=$block->getContainerName();
         </label>
     </div>
 	
-    <input class="upload-file_string admin__control-text" data-form-part="<?php echo$block->getDataformName()?>"  type="text" value="aaa" 
+    <input class="upload-file_string admin__control-text" data-form-part="<?php echo$block->getDataformName()?>"  type="text" value="" 
 	hidden
 	>
 	
@@ -30,10 +30,13 @@ $container_name=$block->getContainerName();
 \vendor\magento\module-ui\view\base\web\js\dynamic-rows\dynamic-rows-grid.js
 -->
 <script type="text/javascript">
-    require(["jquery"], function (jq) {
-        jq(function (e) {
-		console.log("in jq");
+
+    require(["jquery","customfunctions"], function (jq,customfunctions) {
+		
 		var table=jq("table[data-index='<?php echo $container_name; ?>']")[0];
+        jq('document').ready(function (e) {
+		// e.stopPropagation();
+		console.log("in jq docready");
 		// console.log(table);
 		var rows=table.rows;
 		// console.log(rows);
@@ -54,8 +57,19 @@ $container_name=$block->getContainerName();
 			fileinput[0].id="fileinput-"+(i-1);
 			imageplaceholder[0].id="imageplaceholder-"+(i-1);
 			
+			console.log(imagestring[0].value);
+			console.log("changing imagestring");
 			imagestring[0].id="imagestring-"+(i-1);
 			imagestring[0].name="<?php echo $container_name; ?>"+"["+(i-1)+"][imagestring]";
+			console.log(imagestring[0].value);
+			var file_path_ref="<?php echo $container_name; ?>"+"["+(i-1)+"][file_path]";
+			console.log(file_path_ref);
+			customfunctions("<?php echo $container_name; ?>"+"["+(i-1)+"][file_path]",imagestring[0],imageplaceholder[0]).then(function(elem){
+				console.log('Element is ready');
+				// console.log(elem);
+				// imageplaceholder[0].src=elem.value;
+			});
+			;
 		
 			label[0].htmlFor=fileinput[0].id;
 			
@@ -63,7 +77,6 @@ $container_name=$block->getContainerName();
 			}
 		}
 		
-	
 		jq('.upload-file__input').change(function(e)
 		{
 		e.stopImmediatePropagation();
@@ -73,7 +86,16 @@ $container_name=$block->getContainerName();
 		var row_id=row_ref.replace(/fileinput-/g,'');
 		var fileupload_data=jq('#fileinput-'+row_id).val();
 		console.log(fileupload_data);
-		if (e.target.files.length==0 || fileupload_data=='' ) { return; }
+		if (e.target.files.length==0 || fileupload_data=='' ) {
+			file_path_ref="<?php echo $container_name; ?>"+"["+(row_id)+"][file_path]";
+			file_path=document.getElementsByName(file_path_ref)[0].value;
+			imagesrc=document.getElementById('imagestring-'+row_id);
+			imagesrc.value='';
+			imageplaceholder=document.getElementById('imageplaceholder-'+row_id);
+			imageplaceholder.setAttribute('src',file_path);
+			return; 
+			
+			}
 		else{
 		
 		file = this.files[0]
@@ -89,6 +111,7 @@ $container_name=$block->getContainerName();
 						// console.log(event.target.result);
 						imagesrc.value=event.target.result;
 						imageplaceholder.setAttribute('src',  event.target.result);
+						
 				});
 		reader.readAsDataURL(file);
 				

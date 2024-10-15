@@ -117,7 +117,7 @@ xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuratio
                             <item name="formElement" xsi:type="string">input</item>
                             <item name="label" xsi:type="string" translate="true">File Path</item>
                             <item name="dataScope" xsi:type="string">file_path</item>
-                            <item name="visible" xsi:type="boolean">true</item>
+                            <item name="visible" xsi:type="boolean">false</item>
 							<item name="validate-length" xsi:type="boolean">false</item> 
 						</item>
 					</argument>
